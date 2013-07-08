@@ -1,0 +1,51 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>俄罗斯方块</title>
+  <style type="text/css">
+    html {
+      overflow-y: scroll;
+    }
+    table {
+      margin: 0 auto;
+      border: 2px solid black;
+      border-collapse:collapse;
+    }
+    table tr td{
+      border: 1px solid white;
+      width: 20px;
+      height: 20px;
+    }
+  
+  </style>
+
+</head>
+<body>
+  <script type="text/template" id="template-board">
+    <table>
+
+      <% for (var i=0; i<row; i++) {%>
+        <tr>
+          <% for (var j=0; j<col; j++) {%>
+            <td id="coord-<%= j %>-<%= i %>"></td>
+          <% } %>
+        </tr>
+      <% } %>
+
+    </table>
+  </script>
+
+  <script src="lib/jquery.min.js" type="text/javascript"></script> 
+  <script src="lib/underscore-min.js" type="text/javascript"></script> 
+  <script src="lib/backbone-min.js" type="text/javascript"></script> 
+  <script src="tetris.js" type="text/javascript"></script> 
+
+  <script type="text/javascript">
+    
+  </script>
+  <div id="board">
+
+  </div>
+</body>
+</html>
