@@ -53,6 +53,7 @@ activeBlock = null;
 activeBlock = new Array(4); 
 //generate a random int number between 0-6; 
 var t = (Math.floor(Math.random()*20)+1)%7; 
+t = 0
 switch(t){ 
 case 0:{ 
 activeBlock[0] = {x:0, y:4}; 
@@ -190,7 +191,6 @@ tmpBlock[i].y = activeBlock[i].y;
 //先算四个点的中心点，则这四个点围绕中心旋转90度。 
 var cx = Math.round((tmpBlock[0].x + tmpBlock[1].x + tmpBlock[2].x + tmpBlock[3].x)/4); 
 var cy = Math.round((tmpBlock[0].y + tmpBlock[1].y + tmpBlock[2].y + tmpBlock[3].y)/4); 
-console.log(cx, cy);
 //旋转的主要算法. 可以这样分解来理解。 
 //先假设围绕源点旋转。然后再加上中心点的坐标。 
 
@@ -198,6 +198,7 @@ for(var i=0; i<4; i++){
 tmpBlock[i].x = cx+cy-activeBlock[i].y; 
 tmpBlock[i].y = cy-cx+activeBlock[i].x; 
 } 
+console.log(tmpBlock);
 //检查旋转后方格是否合法. 
 for(var i=0; i<4; i++){ 
 if(!isCellValid(tmpBlock[i].x,tmpBlock[i].y)){ 

@@ -3,6 +3,12 @@ $(() ->
   CONFIG = 
     row: 21
     col: 12
+    score: [
+      1
+      2
+      4
+      8
+    ]
 
   APP = 
     status: 0
@@ -75,7 +81,8 @@ $(() ->
      
   # generage component
   genComponent = () -> 
-    random = _.random(0, 3)
+    random = _.random(0, 6)
+    #random = 3
     piece = allPieces[random]
     centerComponent piece
   
@@ -122,27 +129,82 @@ $(() ->
     if check_result
       component = tmpComponent
     else if direction is 'down'
-      setBase()
-      component = genComponent()
+      landed()
+
+  landed = ->
+    setBase()
+    filled = getFilled()
+    if filled.length
+      computeScore filled
+      clearLines filled 
+    component = genComponent()
+
+  computeScore = (filled) ->
+    APP.score += CONFIG.score[filled.length - 1]
+    console.log APP.score, 'computed'
+
+
+  clearLines = (filled) ->
+    domTrs = $ 'table tr'
+    willClear = $ ''
+
+    _.each filled, (row) ->
+      willClear = willClear.add domTrs.eq row
+
+    flash(willClear).find('td').css({'background-color': 'white'})
+    resetBase filled
+
+  resetBase = (filled) ->
+    _.each filled, (row) ->
+      for i in [row ... 0] 
+        for j in [0 ... CONFIG.col]
+          BASE[i][j] = BASE[i - 1][j]
+
+    drawBase()
+
+
+    
+
+  flash = (object, times = 0) ->
+    for i in [0..times]
+      object.fadeOut(150).fadeIn(150)
+    object
 
     
   setBase = ->
     _.each component, (block) ->
-      BASE[block.x][block.y] = 1
+      BASE[block.y][block.x] = 1
     drawBase()
-
-    
-    
     
 
   transform = () ->
+    distinctX = _.uniq _.pluck component, 'x'
+    distinctY = _.uniq _.pluck component, 'y'
+    sumX = _.reduce distinctX, ((mem, x) -> mem + x), 0
+    sumY = _.reduce distinctY, ((mem, y) -> mem + y), 0
+    
+    center_block = {x: Math.floor(sumX / distinctX.length), y: Math.ceil(sumY / distinctY.length)}
+    
+    tmpComponent = _.map component, (block) -> 
+      x: center_block.x + center_block.y - block.y
+      y: center_block.y + block.x - center_block.x - if distinctY.length % 2 is 0 then 1 else 0
+
+    check_result = check tmpComponent
+    if check_result
+      erase component
+      component = tmpComponent 
+      draw component
+    else
+      console.log 1
+
+      
     
 
   # check
   check = (tmpComponent) ->
     _.every tmpComponent, (block) ->
       not_over = 0 <= block.x < CONFIG.col and 0 <= block.y < CONFIG.row
-      not_over and BASE[block.x][block.y] is 0
+      not_over and BASE[block.y][block.x] is 0
     
 
     
@@ -150,15 +212,28 @@ $(() ->
   erase = (component) ->
     paintColor(component, 'white')
      
-    
-    
-     
 
   drawBase = () ->
     for x, yArray of BASE
       for y, filled of yArray
         if filled is 1
-          $("#coord-#{x}-#{y}").css({'background-color': 'blue'});
+          $("#coord-#{y}-#{x}").css({'background-color': 'blue'});
+        else
+          $("#coord-#{y}-#{x}").css({'background-color': 'white'});
+          
+
+  getFilled = ->
+    filledList = []
+    domTrs = $ 'table tr'
+    willClear = $ ''
+
+    _.each BASE, (row, y) ->
+      if (_.compact row).length is CONFIG.col
+        filledList.push(y)
+    filledList
+
+    
+      
         
     
 
@@ -182,10 +257,10 @@ $(() ->
   component = genComponent()
 
   BASE = [] 
-  for c in [0...CONFIG.col]
-    for r in [0...CONFIG.row]
-      BASE[c] ?= []
-      BASE[c][r] = 0
+  for r in [0...CONFIG.row]
+    for c in [0...CONFIG.col]
+      BASE[r] ?= []
+      BASE[r][c] = 0
 
   draw component
   APP.timer = setInterval (-> moveDown(component)), 1000
