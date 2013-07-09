@@ -3,7 +3,7 @@ $(() ->
   CONFIG = 
     row: 21
     col: 12
-    score: [
+    scoreMap: [
       1
       2
       4
@@ -11,12 +11,13 @@ $(() ->
     ]
 
   APP = 
-    status: 0
+    status: 0 # 0: init | 1: running | 2: paused | 3: lost
     score: 0
     next: null
     timer: null
 
   component = null
+  BASE = []
 
  
   allPieces = [
@@ -64,10 +65,10 @@ $(() ->
     ]
     # Z 
     [
-      {x: 0, y: 0}
-      {x: 1, y: 0}
+      {x: 0, y: 1}
       {x: 1, y: 1}
-      {x: 2, y: 1}
+      {x: 1, y: 2}
+      {x: 2, y: 2}
     ]
   ]
 
@@ -81,10 +82,13 @@ $(() ->
      
   # generage component
   genComponent = () -> 
-    random = _.random(0, 6)
-    #random = 3
-    piece = allPieces[random]
-    centerComponent piece
+    if not checkFailed()
+      random = _.random(0, 6)
+      #random = 6
+      piece = allPieces[random]
+      centerComponent piece
+    else 
+      fail()
   
 
   # paintColor
@@ -99,9 +103,10 @@ $(() ->
 
   # down
   moveDown = () ->
-    erase component 
-    move 'down'
-    draw component
+    if APP.status is 1
+      erase component 
+      move 'down'
+      draw component
 
   # left
   moveLeft = () ->
@@ -140,8 +145,11 @@ $(() ->
     component = genComponent()
 
   computeScore = (filled) ->
-    APP.score += CONFIG.score[filled.length - 1]
-    console.log APP.score, 'computed'
+    APP.score += CONFIG.scoreMap[filled.length - 1]
+    showScore APP.score
+
+  showScore = (score) ->
+    $('#score').text score
 
 
   clearLines = (filled) ->
@@ -152,9 +160,9 @@ $(() ->
       willClear = willClear.add domTrs.eq row
 
     flash(willClear).find('td').css({'background-color': 'white'})
-    resetBase filled
+    dropBase filled
 
-  resetBase = (filled) ->
+  dropBase = (filled) ->
     _.each filled, (row) ->
       for i in [row ... 0] 
         for j in [0 ... CONFIG.col]
@@ -205,6 +213,11 @@ $(() ->
     _.every tmpComponent, (block) ->
       not_over = 0 <= block.x < CONFIG.col and 0 <= block.y < CONFIG.row
       not_over and BASE[block.y][block.x] is 0
+
+  checkFailed = ->
+    _.compact(BASE[0]).length
+    
+    
     
 
     
@@ -217,7 +230,7 @@ $(() ->
     for x, yArray of BASE
       for y, filled of yArray
         if filled is 1
-          $("#coord-#{y}-#{x}").css({'background-color': 'blue'});
+          $("#coord-#{y}-#{x}").css({'background-color': '#ccc'});
         else
           $("#coord-#{y}-#{x}").css({'background-color': 'white'});
           
@@ -233,17 +246,14 @@ $(() ->
     filledList
 
     
-      
-        
-    
 
   # render board
   compiled = _.template($('#template-board').html());
-  $('#board').html(compiled(CONFIG));
+  $('#board').html(compiled(_.extend({}, CONFIG, APP)));
 
   # keyboard event
   $(document).keydown (e) ->
-    if APP.status is 0
+    if APP.status isnt 1
       return
     switch e.which
       when 37 then moveLeft()
@@ -252,19 +262,93 @@ $(() ->
       when 40 then moveDown()
       
 
+  rebase = ->
+    for r in [0...CONFIG.row]
+      for c in [0...CONFIG.col]
+        BASE[r] ?= []
+        BASE[r][c] = 0
+    $('td').css({'background-color': 'white'})
+
   # start
-  APP.status = 1
-  component = genComponent()
+  start = ->
+    rebase()
+    APP.status = 1
+    component = genComponent()
+    draw component
+    APP.timer = setInterval (-> moveDown(component)), 1000
 
-  BASE = [] 
-  for r in [0...CONFIG.row]
-    for c in [0...CONFIG.col]
-      BASE[r] ?= []
-      BASE[r][c] = 0
+  # pause
+  pause = ->
+    APP.status = 2
 
-  draw component
-  APP.timer = setInterval (-> moveDown(component)), 1000
-)
+  resume = ->
+    APP.status = 1
+
+  restart = ->
+    rebase()
+    
+
+  fail = ->
+    APP.status = 3
+    showInfo 'You Lost'
+    showBtn 'start'
+
+
+    
+
+  showInfo = (info) ->
+    $('.backdrop').find('.message').text(info).end().show()
+    
+  hideInfo = (info) ->
+    $('.backdrop').hide()
+
+  startFlash = (callback) ->
+    domBackdrop = $ '.backdrop'
+    domMessage = domBackdrop.find '.message'
+    
+    domMessage.text 'Ready'
+    _.delay((->
+      domMessage.text 'Go!'
+      _.delay((->
+        domBackdrop.hide()
+        callback()
+      ), 300)
+
+    ), 300)
+    
+  showBtn = (type) ->
+    $('button').hide()
+    $("[data-action=#{type}]").show()
+
+  
+  # bind start event
+
+  $('button').click (e) ->
+    target = $(this)
+    action = target.data('action');
+
+    switch action
+      when 'start' 
+        if APP.status is 0
+          startFlash(start)
+        else if APP.status is 2
+          resume()
+          hideInfo()
+        else if APP.status is 3
+          startFlash(start)
+
+        showBtn 'pause'
+      when 'pause' 
+        if APP.status is 1
+          pause()
+          showBtn 'start'
+          showInfo 'Pause'
+         
+
+  $('#btn-start').click (e) ->
+
+
+);
 
 
     

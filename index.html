@@ -7,15 +7,50 @@
     html {
       overflow-y: scroll;
     }
+    body {
+      text-align: center;
+    }
+    #board {
+      display: inline-block;
+    }
     table {
-      margin: 0 auto;
-      border: 2px solid black;
       border-collapse:collapse;
     }
     table tr td{
-      border: 1px solid black;
+      border: 1px solid white;
       width: 20px;
       height: 20px;
+    }
+    #control {
+      float:left;
+      padding: 0 0 0 15px;
+    }
+    button {
+      cursor: pointer;
+      width: 70px;
+      height: 30px;
+    }
+    .gamearea {
+      float: left; 
+      border: 1px solid black;
+      position: relative;
+    }
+    .backdrop {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-color: #000;
+      top: 0;
+      opacity: 0.7;
+      filter: alpha(opacity=70);
+    }
+    .backdrop .message {
+      position: absolute;
+      color: white;
+      width: 100%;
+      text-align: center;
+      top: 35%;
+      font-size: 35px;
     }
   
   </style>
@@ -23,16 +58,32 @@
 </head>
 <body>
   <script type="text/template" id="template-board">
-    <table>
+    <div class="gamearea">
+      <table>
 
-      <% for (var i=0; i<row; i++) {%>
-        <tr>
-          <% for (var j=0; j<col; j++) {%>
-            <td id="coord-<%= j %>-<%= i %>"></td>
-          <% } %>
-        </tr>
-      <% } %>
+        <% for (var i=0; i<row; i++) {%>
+          <tr>
+            <% for (var j=0; j<col; j++) {%>
+              <td id="coord-<%= j %>-<%= i %>"></td>
+            <% } %>
+          </tr>
+        <% } %>
 
+      </table>
+      <div class="backdrop"><div class="message">...</div></div>
+    </div>
+    <div id="control">
+      <p>
+        Score: <span id="score"><%= score%></span>
+      </p>
+
+      <button data-action="start">Start</button>
+      <button data-action="pause" style="display:none;">Pause</button>
+    </div>
+    <table class="preview">
+      <tr>
+        <td></td>
+      <tr>
     </table>
   </script>
 
