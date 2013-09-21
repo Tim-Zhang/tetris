@@ -2,13 +2,22 @@ $(() ->
   # config
   CONFIG = 
     row: 21
+
     col: 12
+    
     scoreMap: [
       1
       2
       4
       8
     ]
+
+    keyMap:
+      up    :  38
+      down  :  40 
+      left  :  37
+      right :  39
+      space :  32
 
   APP = 
     status: 0 # 0: init | 1: running | 2: paused | 3: lost
@@ -252,15 +261,18 @@ $(() ->
 
   # keyboard event
   $(document).keydown (e) ->
-    e.preventDefault()
+    keyMap = CONFIG.keyMap
+    keyCode = e.which
+    if _.contains keyMap, keyCode
+      e.preventDefault()
     if APP.status isnt 1
       return
-    switch e.which
-      when 37 then moveLeft()
-      when 38 then transform()
-      when 39 then moveRight()
-      when 40 then moveDown()
-      
+    switch keyCode
+      when keyMap.left   then moveLeft()
+      when keyMap.up     then transform()
+      when keyMap.right  then moveRight()
+      when keyMap.down   then moveDown()
+      when keyMap.space  then _(3).times moveDown
 
   rebase = ->
     for r in [0...CONFIG.row]

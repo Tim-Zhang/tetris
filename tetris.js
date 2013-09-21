@@ -5,7 +5,14 @@
     CONFIG = {
       row: 21,
       col: 12,
-      scoreMap: [1, 2, 4, 8]
+      scoreMap: [1, 2, 4, 8],
+      keyMap: {
+        up: 38,
+        down: 40,
+        left: 37,
+        right: 39,
+        space: 32
+      }
     };
     APP = {
       status: 0,
@@ -345,19 +352,26 @@
     compiled = _.template($('#template-board').html());
     $('#board').html(compiled(_.extend({}, CONFIG, APP)));
     $(document).keydown(function(e) {
-      e.preventDefault();
+      var keyCode, keyMap;
+      keyMap = CONFIG.keyMap;
+      keyCode = e.which;
+      if (_.contains(keyMap, keyCode)) {
+        e.preventDefault();
+      }
       if (APP.status !== 1) {
         return;
       }
-      switch (e.which) {
-        case 37:
+      switch (keyCode) {
+        case keyMap.left:
           return moveLeft();
-        case 38:
+        case keyMap.up:
           return transform();
-        case 39:
+        case keyMap.right:
           return moveRight();
-        case 40:
+        case keyMap.down:
           return moveDown();
+        case keyMap.space:
+          return _(3).times(moveDown);
       }
     });
     rebase = function() {
