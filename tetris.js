@@ -142,18 +142,19 @@
       }
     };
     paintColor = function(block, color) {
-      var b, _i, _len, _results;
-      _results = [];
+      var b, table, _i, _len;
+      table = $('.gamearea table').get(0);
       for (_i = 0, _len = block.length; _i < _len; _i++) {
         b = block[_i];
-        _results.push($("#coord-" + b.x + "-" + b.y).css({
-          'background-color': color
-        }));
+        table.rows[b.y].cells[b.x].style.backgroundColor = color;
+        null;
       }
-      return _results;
+      return null;
     };
     draw = function(component) {
-      return paintColor(component, 'blue');
+      if (APP.status === 1) {
+        return paintColor(component, 'blue');
+      }
     };
     moveDown = function() {
       if (APP.status === 1) {
@@ -313,29 +314,21 @@
       return paintColor(component, 'white');
     };
     drawBase = function() {
-      var filled, x, y, yArray, _results;
-      _results = [];
-      for (x in BASE) {
-        yArray = BASE[x];
-        _results.push((function() {
-          var _results1;
-          _results1 = [];
-          for (y in yArray) {
-            filled = yArray[y];
-            if (filled === 1) {
-              _results1.push($("#coord-" + y + "-" + x).css({
-                'background-color': '#ccc'
-              }));
-            } else {
-              _results1.push($("#coord-" + y + "-" + x).css({
-                'background-color': 'white'
-              }));
-            }
+      var filled, table, x, xArray, y;
+      table = $('.gamearea table').get(0);
+      for (y in BASE) {
+        xArray = BASE[y];
+        for (x in xArray) {
+          filled = xArray[x];
+          if (filled === 1) {
+            table.rows[y].cells[x].style.backgroundColor = '#ccc';
+          } else {
+            table.rows[y].cells[x].style.backgroundColor = '#fff';
           }
-          return _results1;
-        })());
+          null;
+        }
       }
-      return _results;
+      return null;
     };
     getFilled = function() {
       var domTrs, filledList, willClear;
@@ -352,6 +345,7 @@
     compiled = _.template($('#template-board').html());
     $('#board').html(compiled(_.extend({}, CONFIG, APP)));
     $(document).keydown(function(e) {
+      e.preventDefault();
       if (APP.status !== 1) {
         return;
       }
@@ -376,7 +370,7 @@
           BASE[r][c] = 0;
         }
       }
-      return $('td').css({
+      return $('.gamearea td').css({
         'background-color': 'white'
       });
     };
@@ -399,9 +393,11 @@
       return rebase();
     };
     fail = function() {
+      clearInterval(APP.timer);
       APP.status = 3;
       showInfo('You Lost');
-      return showBtn('start');
+      showBtn('start');
+      return null;
     };
     showInfo = function(info) {
       return $('.backdrop').find('.message').text(info).end().show();
@@ -453,7 +449,3 @@
   });
 
 }).call(this);
-
-/*
-//@ sourceMappingURL=tetris.map
-*/

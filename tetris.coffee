@@ -93,13 +93,17 @@ $(() ->
 
   # paintColor
   paintColor = (block, color) ->
+    table = $('.gamearea table').get 0
     for b in block
-      $("#coord-#{b.x}-#{b.y}").css({'background-color': color});
+      table.rows[b.y].cells[b.x].style.backgroundColor = color
+      null
+    null
 
 
   # draw
   draw = (component) ->
-    paintColor(component, 'blue')
+    if APP.status is 1
+      paintColor(component, 'blue')
 
   # down
   moveDown = () ->
@@ -171,8 +175,6 @@ $(() ->
     drawBase()
 
 
-    
-
   flash = (object, times = 0) ->
     for i in [0..times]
       object.fadeOut(150).fadeIn(150)
@@ -206,8 +208,6 @@ $(() ->
       console.log 1
 
       
-    
-
   # check
   check = (tmpComponent) ->
     _.every tmpComponent, (block) ->
@@ -218,22 +218,21 @@ $(() ->
     _.compact(BASE[0]).length
     
     
-    
-
-    
   # erase
   erase = (component) ->
     paintColor(component, 'white')
      
 
   drawBase = () ->
-    for x, yArray of BASE
-      for y, filled of yArray
+    table = $('.gamearea table').get 0
+    for y, xArray of BASE
+      for x, filled of xArray
         if filled is 1
-          $("#coord-#{y}-#{x}").css({'background-color': '#ccc'});
+          table.rows[y].cells[x].style.backgroundColor = '#ccc'
         else
-          $("#coord-#{y}-#{x}").css({'background-color': 'white'});
-          
+          table.rows[y].cells[x].style.backgroundColor = '#fff'
+        null
+    null
 
   getFilled = ->
     filledList = []
@@ -253,6 +252,7 @@ $(() ->
 
   # keyboard event
   $(document).keydown (e) ->
+    e.preventDefault()
     if APP.status isnt 1
       return
     switch e.which
@@ -267,7 +267,7 @@ $(() ->
       for c in [0...CONFIG.col]
         BASE[r] ?= []
         BASE[r][c] = 0
-    $('td').css({'background-color': 'white'})
+    $('.gamearea td').css({'background-color': 'white'})
 
   # start
   start = ->
@@ -286,15 +286,13 @@ $(() ->
 
   restart = ->
     rebase()
-    
 
   fail = ->
+    clearInterval APP.timer
     APP.status = 3
     showInfo 'You Lost'
     showBtn 'start'
-
-
-    
+    null
 
   showInfo = (info) ->
     $('.backdrop').find('.message').text(info).end().show()
