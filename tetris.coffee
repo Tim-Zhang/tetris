@@ -168,12 +168,14 @@ $(() ->
     console.log nextComponent
 
   previewNext = (component) ->
+    if not component
+      return
     $preview = $ '.preview table'
     $preview.find('td').css 'background-color', 'white'
     preview = $preview.get 0
     color = 'blue'
 
-    for b in nextComponent
+    for b in component
       preview.rows[b.y].cells[b.x].style.backgroundColor = color
       null
     null
@@ -306,6 +308,8 @@ $(() ->
 
   # start
   start = ->
+    APP.score = 0
+    showScore APP.score
     rebase()
     APP.status = 1
     componentHandle()

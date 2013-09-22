@@ -238,12 +238,15 @@
     };
     previewNext = function(component) {
       var $preview, b, color, preview, _i, _len;
+      if (!component) {
+        return;
+      }
       $preview = $('.preview table');
       $preview.find('td').css('background-color', 'white');
       preview = $preview.get(0);
       color = 'blue';
-      for (_i = 0, _len = nextComponent.length; _i < _len; _i++) {
-        b = nextComponent[_i];
+      for (_i = 0, _len = component.length; _i < _len; _i++) {
+        b = component[_i];
         preview.rows[b.y].cells[b.x].style.backgroundColor = color;
         null;
       }
@@ -413,6 +416,8 @@
       });
     };
     start = function() {
+      APP.score = 0;
+      showScore(APP.score);
       rebase();
       APP.status = 1;
       componentHandle();
