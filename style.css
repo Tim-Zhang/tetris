@@ -15,9 +15,14 @@ table tr td{
   width: 20px;
   height: 20px;
 }
-#control {
+.right {
   float:left;
   padding: 0 0 0 15px;
+}
+#control {
+}
+.preview {
+  margin-top: 20px;
 }
 button {
   cursor: pointer;

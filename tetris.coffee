@@ -2,7 +2,6 @@ $(() ->
   # config
   CONFIG = 
     row: 21
-
     col: 12
     
     scoreMap: [
@@ -26,6 +25,7 @@ $(() ->
     timer: null
 
   component = null
+  nextComponent = null
   BASE = []
 
  
@@ -94,8 +94,7 @@ $(() ->
     if not checkFailed()
       random = _.random(0, 6)
       #random = 6
-      piece = allPieces[random]
-      centerComponent piece
+      allPieces[random]
     else 
       fail()
   
@@ -155,7 +154,31 @@ $(() ->
     if filled.length
       computeScore filled
       clearLines filled 
-    component = genComponent()
+    componentHandle()
+
+  componentHandle = ->
+    if nextComponent
+      component = centerComponent nextComponent
+      nextComponent = genComponent()
+    else
+      component = centerComponent genComponent()
+      nextComponent = genComponent()
+
+    previewNext nextComponent
+    console.log nextComponent
+
+  previewNext = (component) ->
+    $preview = $ '.preview table'
+    $preview.find('td').css 'background-color', 'white'
+    preview = $preview.get 0
+    color = 'blue'
+
+    for b in nextComponent
+      preview.rows[b.y].cells[b.x].style.backgroundColor = color
+      null
+    null
+
+
 
   computeScore = (filled) ->
     APP.score += CONFIG.scoreMap[filled.length - 1]
@@ -237,7 +260,7 @@ $(() ->
     for y, xArray of BASE
       for x, filled of xArray
         if filled is 1
-          table.rows[y].cells[x].style.backgroundColor = '#ccc'
+          table.rows[y].cells[x].style.backgroundColor = '#888'
         else
           table.rows[y].cells[x].style.backgroundColor = '#fff'
         null
@@ -285,7 +308,7 @@ $(() ->
   start = ->
     rebase()
     APP.status = 1
-    component = genComponent()
+    componentHandle()
     draw component
     APP.timer = setInterval (-> moveDown(component)), 1000
 

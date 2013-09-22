@@ -30,19 +30,30 @@
       </table>
       <div class="backdrop"><div class="message">...</div></div>
     </div>
-    <div id="control">
-      <p>
-        Score: <span id="score"><%= score%></span>
-      </p>
+    <div class="right">
+      <div id="control">
+        <p>
+          Score: <span id="score"><%= score%></span>
+        </p>
 
-      <button data-action="start">Start</button>
-      <button data-action="pause" style="display:none;">Pause</button>
+        <button data-action="start">Start</button>
+        <button data-action="pause" style="display:none;">Pause</button>
+      </div>
+
+      <fieldset class="preview">
+        <legend>Preview</legend>
+        <table>
+          <% for (var i=0; i<4; i++) { %>
+            <tr>
+              <% for (var j=0; j<4; j++) { %>
+                <td></td>
+              <% } %>
+            </tr>
+          <% } %>
+
+        </table>
+      </fieldset>
     </div>
-    <table class="preview">
-      <tr>
-        <td></td>
-      <tr>
-    </table>
   </script>
 
   <script src="lib/jquery.min.js" type="text/javascript"></script>
