@@ -515,11 +515,16 @@
       ev.gesture.preventDefault();
       return ev.gesture.stopDetect();
     };
-    Hammer(document).on("doubletap", function(event) {
-      return stopDefault(event);
-    });
     Hammer(document).on("touch", function(event) {
-      return stopDefault(event);
+      var relative;
+      if (APP.status !== 1) {
+        return;
+      }
+      relative = getTapRelPos(event.gesture.center);
+      if (relative === 'down') {
+        stopDefault(event);
+        return moveDown();
+      }
     });
     return Hammer(document).on("tap", function(event) {
       var relative;

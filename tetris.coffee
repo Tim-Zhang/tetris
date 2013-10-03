@@ -410,11 +410,13 @@ $(() ->
     ev.gesture.preventDefault()
     ev.gesture.stopDetect()
 
-  Hammer(document).on "doubletap", (event) ->
-    stopDefault event
-
   Hammer(document).on "touch", (event) ->
-    stopDefault event
+    if APP.status isnt 1
+      return
+    relative = getTapRelPos event.gesture.center
+    if relative is 'down' 
+      stopDefault event
+      moveDown()
 
   Hammer(document).on "tap", (event) ->
     if APP.status isnt 1
