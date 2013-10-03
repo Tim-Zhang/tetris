@@ -403,8 +403,10 @@ $(() ->
     relative
 
 
+  Hammer(document).on "doubletap", (event) ->
+    event.preventDefault()
 
-  hammertime = Hammer(document).on "tap", (event) ->
+  Hammer(document).on "tap", (event) ->
     if APP.status isnt 1
       return
     event.preventDefault()
@@ -415,6 +417,7 @@ $(() ->
       when 'right'  then moveRight()
       when 'down'   then moveDown()
     null
+
 
 )
 
