@@ -384,8 +384,39 @@ $(() ->
 
   $('#btn-start').click (e) ->
 
+  getTapRelPos = (pos) ->
+    $gamearea = $ '.gamearea'
+    top = $gamearea.position().top
+    left = $gamearea.position().left
+    height = $gamearea.height()
+    width = $gamearea.width()
+    relative = null
+    if pos.pageY > top + height
+      relative = 'down'
+    else if pos.pageX < left
+      relative = 'left'
+    else if pos.pageX > left + width
+      relative = 'right'
+    else
+      relative = 'up'
 
-);
+    relative
+
+
+
+  hammertime = Hammer(document).on "tap", (event) ->
+    if APP.status isnt 1
+      return
+    event.preventDefault()
+    relative =  getTapRelPos(event.gesture.center)
+    switch relative
+      when 'left'   then moveLeft()
+      when 'up'     then transform()
+      when 'right'  then moveRight()
+      when 'down'   then moveDown()
+    null
+
+)
 
 
     
