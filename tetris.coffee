@@ -403,8 +403,18 @@ $(() ->
     relative
 
 
+  stopDefault = (ev) ->
+    ev.stopPropagation()
+    ev.preventDefault()
+    ev.gesture.stopPropagation()
+    ev.gesture.preventDefault()
+    ev.gesture.stopDetect()
+
   Hammer(document).on "doubletap", (event) ->
-    event.preventDefault()
+    stopDefault event
+
+  Hammer(document).on "touch", (event) ->
+    stopDefault event
 
   Hammer(document).on "tap", (event) ->
     if APP.status isnt 1
